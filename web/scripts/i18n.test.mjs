@@ -62,11 +62,23 @@ test("Chinese browser tags, fallback languages, invalid preferences and blocked 
   for (const tag of ["zh", "zh-CN", "zh-SG", "zh-Hans-CN", "ZH-cn"]) {
     assert.equal(load({ languages: [tag] }).api.locale, "zh-CN");
   }
-  assert.equal(load({ saved: "invalid", languages: ["fr-FR", "zh-CN"] }).api.locale, "zh-CN");
+  assert.equal(load({ saved: "invalid", languages: ["de-DE", "zh-CN"] }).api.locale, "zh-CN");
   assert.equal(load({ blocked: true, languages: ["zh-CN"] }).api.locale, "zh-CN");
   assert.equal(load({ languages: null, language: "zh-CN" }).api.locale, "zh-CN");
   assert.equal(load({ languages: [], language: "zh-CN" }).api.locale, "en");
-  assert.equal(load({ languages: ["fr-FR"] }).api.locale, "en");
+  assert.equal(load({ languages: ["de-DE"] }).api.locale, "en");
+});
+
+test("French browser tags and saved preference select the French dictionary", () => {
+  for (const tag of ["fr", "fr-FR", "fr-CA", "fr-BE", "FR-fr"]) {
+    assert.equal(load({ languages: [tag] }).api.locale, "fr");
+  }
+  const { api, document } = load({ saved: "fr", languages: ["zh-CN"] });
+  assert.equal(api.locale, "fr");
+  assert.equal(api.intlLocale, "fr-FR");
+  assert.equal(document.documentElement.lang, "fr");
+  assert.equal(api.t("Language"), "Langue");
+  assert.equal(api.t("Unknown {value}", { value: 3 }), "Unknown 3");
 });
 
 test("existing English and Turkish preferences and formatting are preserved", () => {
